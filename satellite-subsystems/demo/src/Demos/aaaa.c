@@ -434,7 +434,7 @@ static Boolean TurnOnTransponderWithDelay(void){
 	int time_in_min=0;
 	while(UTIL_DbguGetIntegerMinMax(&time_in_min, 1, 20) == 0);
 
-	vTaskDelay(time_in_min *(60000 / portTICK_RATE_MS)); // ms: s 1000:1 ...
+	vTaskDelay(time_in_min *(60000 / portTICK_RATE_MS)); // ms: s 1000:1 ....
 
 	unsigned char turn_off_cmd[] ={0x38,1};
 	I2C_write(0x61, turn_off_cmd, 2);
@@ -549,7 +549,6 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	case 17:
 		offerMoreTests = FALSE;
 		break;
-
 	default:
 		break;
 	}
