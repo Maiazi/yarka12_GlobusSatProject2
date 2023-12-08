@@ -467,7 +467,7 @@ static Boolean turnOnTransponderWithTask(void){
 	I2C_write(0x61,turn_on_cmd,2);
 	int time_in_min=0;
 	while(UTIL_DbguGetIntegerMinMax(&time_in_min, 1, 20) == 0);
-	xTaskCreate(TransponderTimerTask, (signed char*)"TransponderTimerTask",2048,(void*)time_in_min,tskIDLE_PRIORITY,NULL);
+	xTaskCreate( TransponderTimerTask,(signed char*)"TransponderTimerTask", 2048, (void *)time_in_min, tskIDLE_PRIORITY, NULL);
 	return TRUE;
 }
 
