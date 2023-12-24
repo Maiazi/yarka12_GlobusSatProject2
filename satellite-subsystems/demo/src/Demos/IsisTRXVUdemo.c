@@ -427,6 +427,67 @@ static Boolean vutc_getTxTelemTest_revD(void)
 	return TRUE;
 }
 
+static Boolean vutc_sendPacketInsertedByTheUser(void)
+{
+	unsigned char testBuffer[5];
+	int amountOfRepetitions;
+	unsigned char txCounter = 0;
+	unsigned char avalFrames = 0;
+	int timeoutCounter = 0;
+	int i;
+	unsigned int temp;
+	printf("\r\nEnter buffer: \r\n");
+	for(i = 0; i < 5 ; i++)
+	{
+		if (UTIL_DbguGetHexa32(&temp) == 1)
+			testBuffer[i] = (unsigned char)temp;
+		else
+			i--;
+	}
+	printf("\r\nEnter amount of repetitions: \r\n");
+	while(UTIL_DbguGetIntegerMinMax(&amountOfRepetitions, 1, 1000) == 0);
+	while(txCounter < amountOfRepetitions && timeoutCounter < amountOfRepetitions)
+	{
+		printf("\r\n Transmission of single buffers with default callsign. AX25 Format. \r\n");
+		print_error(IsisTrxvu_tcSendAX25DefClSign(0, testBuffer, 5, &avalFrames));
+
+		if ((avalFrames != 0)&&(avalFrames != 255))
+		{
+			printf("\r\n Number of frames in the buffer: %d  \r\n", avalFrames);
+			txCounter++;
+		}
+		else
+		{
+			vTaskDelay(100 / portTICK_RATE_MS);
+			timeoutCounter++;
+		}
+	}
+
+	return TRUE;
+}
+
+
+
+static Boolean beacon_test(void)
+{
+	static unsigned char fromCallSign[7] = {'I', 'K', 'Q', 'H', 'S', '1', 0};
+	static unsigned char toCallSign[7] = {'I', 'K', 'Q', 'G', 'S', '2', 0};
+	static unsigned char data[82] = "KQ Cube Sat Lost in Space, abducted by grumpy old green aliens!";
+	printf("TRXVU Beacon test.\r\n");
+	INPUT_GetSTRING("Beacon Message (max 80 chars): ", data, sizeof(data));
+	unsigned short interval = INPUT_GetUINT16("Becon interval in seconds: ");
+	int r = IsisTrxvu_tcSetAx25BeaconOvrClSign(0, fromCallSign, toCallSign, data, sizeof(data), interval);
+	print_error(r);
+	return TRUE;
+}
+
+static Boolean clear_beacon_test(void)
+{
+	int r = IsisTrxuv_itcClearBeacon(0);
+	print_error(r);
+	return TRUE;
+}
+
 static Boolean TurnOnTransponderWithDelay(void){
 	unsigned char turn_on_cmd[] ={0x38,2};
 	I2C_write(0x61, turn_on_cmd, 2);
@@ -493,9 +554,12 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 14) TurnOnTransponder \n\r");
 	printf("\t 15) TurnOffTransponder \n\r");
 	printf("\t 16) turnOnTransponderWithTask \n\r");
-	printf("\t 17) Return to main menu \n\r");
+	printf("\t 17) Send Packet Inserted By The User \n\r");
+	printf("\t 18) Beacon test \n\r");
+	printf("\t 19) Clear the Beacon \n\r");
+	printf("\t 20) Return to main menu \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 17) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 1, 20) == 0);
 
 	switch(selection) {
 	case 1:
@@ -547,6 +611,15 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 		offerMoreTests = turnOnTransponderWithTask();
 		break;
 	case 17:
+		offerMoreTests = vutc_sendPacketInsertedByTheUser();
+		break;
+	case 18:
+		offerMoreTests = beacon_test();
+		break;
+	case 19:
+		offerMoreTests = clear_beacon_test();
+		break;
+	case 20:
 		offerMoreTests = FALSE;
 		break;
 

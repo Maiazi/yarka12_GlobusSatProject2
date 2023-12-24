@@ -371,6 +371,22 @@ static Boolean EPS_TelemetryHKGeneral_BatteryLoop(void)
     return TRUE;
 }
 
+Boolean EPS_Get_State(void){
+	int max_bat_val = 8000;
+	gom_eps_hkparam_t myEpsTelemetry_param;
+	printf("\r\nEPS Telemetry HK Param \r\n\n");
+	print_error(GomEpsGetHkData_param(0, &myEpsTelemetry_param));
+	printf("Battery Voltage = %d mV \r\n", myEpsTelemetry_param.fields.bv);
+	if(myEpsTelemetry_param.fields.bv >= 0.7*max_bat_val)
+		printf("satellite is in Normal_Mode, all systems are ON");
+	else if(myEpsTelemetry_param.fields.bv >= 0.3*max_bat_val &&
+			myEpsTelemetry_param.fields.bv < 0.7*max_bat_val)
+		printf("satellite is in Low_Mode, all systems is ON except Payload");
+	else if(myEpsTelemetry_param.fields.bv < 0.3*max_bat_val)
+			printf("satellite is in Critical_Mode, all systems is OFF except OBC is ON");
+	return TRUE;
+}
+
 static Boolean selectAndExecuteGomEPSDemoTest(void)
 {
 	int selection = 0;
@@ -388,8 +404,9 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
 	printf("\t 8) EPS Enable channel \n\r");
 	printf("\t 9) EPS Disable channel \n\r");
 	printf("\t 10) EPS Reboot \n\r");
+	printf("\t 11) EPS get state \n\r");
 
-	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 10) == 0);
+	while(UTIL_DbguGetIntegerMinMax(&selection, 0, 11) == 0);
 
 	switch(selection) {
 	case 0:
@@ -425,12 +442,17 @@ static Boolean selectAndExecuteGomEPSDemoTest(void)
     case 10:
     	offerMoreTests = EPS_Reboot();
     	break;
+    case 11:
+       	offerMoreTests = EPS_Get_State();
+       	break;
 	default:
 		break;
 	}
 
 	return offerMoreTests;
 }
+
+
 
 Boolean GomEPSdemoInit(void)
 {
