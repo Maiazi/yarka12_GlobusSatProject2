@@ -378,12 +378,12 @@ Boolean EPS_Get_State(void){
 	print_error(GomEpsGetHkData_param(0, &myEpsTelemetry_param));
 	printf("Battery Voltage = %d mV \r\n", myEpsTelemetry_param.fields.bv);
 	if(myEpsTelemetry_param.fields.bv >= 0.7*max_bat_val)
-		printf("satellite is in Normal_Mode, all systems are ON");
+		printf("satellite is in Normal_Mode, all systems are ON \r\n");
 	else if(myEpsTelemetry_param.fields.bv >= 0.3*max_bat_val &&
 			myEpsTelemetry_param.fields.bv < 0.7*max_bat_val)
-		printf("satellite is in Low_Mode, all systems is ON except Payload");
+		printf("satellite is in Low_Mode, all systems is ON except Payload \r\n");
 	else if(myEpsTelemetry_param.fields.bv < 0.3*max_bat_val)
-			printf("satellite is in Critical_Mode, all systems is OFF except OBC is ON");
+			printf("satellite is in Critical_Mode, all systems is OFF except OBC is ON \r\n");
 	return TRUE;
 }
 

@@ -470,10 +470,12 @@ static Boolean vutc_sendPacketInsertedByTheUser(void)
 
 static Boolean beacon_test(void)
 {
-	static unsigned char fromCallSign[7] = {'A', 'B', 'C', 'D', 'E', 'F', 0};
-	static unsigned char toCallSign[7] = {'A', 'B', 'C', 'D', 'E', 'F', 0};
-	static unsigned char data[40] = "QubeSat Yarka is in air .. say hi .....";
-	printf("TRXVU Beacon test.\r\n");
+	static unsigned char fromCallSign[7] = {'A', 'H', 'V', 'A', '1', '0', 0};
+	static unsigned char toCallSign[7] = {'Y', 'A', 'R', 'K', 'A', '1', 0};
+	static unsigned char data[80] = "";
+	//CubeSat Yarka is in air .. say hi to all universe .....
+	printf("TRXVU Beacon test:\r\n");
+	printf("write your message:\r\n");
 	INPUT_GetSTRING("Beacon Message (max 80 chars): ", data, sizeof(data));
 	unsigned short interval = INPUT_GetUINT16("Becon interval in seconds: ");
 	int r = IsisTrxvu_tcSetAx25BeaconOvrClSign(0, fromCallSign, toCallSign, data, sizeof(data), interval);
@@ -489,6 +491,7 @@ static Boolean clear_beacon_test(void)
 }
 
 static Boolean TurnOnTransponderWithDelay(void){
+	printf("pick time in minutes for Turning ON the transporder: \n\r");
 	unsigned char turn_on_cmd[] ={0x38,2};
 	I2C_write(0x61, turn_on_cmd, 2);
 
@@ -506,12 +509,14 @@ static Boolean TurnOnTransponderWithDelay(void){
 static Boolean TurnOnTransponder(void){
 	unsigned char turn_on_cmd[] = {0x38,2};
 	I2C_write(0x61,turn_on_cmd,2);
+	printf("Transponder is ON \n\r");
 	return TRUE;
 }
 
 static Boolean TurnOffTransponder(void){
 	unsigned char turn_off_cmd[] = {0x38,1};
 	I2C_write(0x61,turn_off_cmd,2);
+	printf("Transponder is OFF \n\r");
 	return TRUE;
 }
 
@@ -520,7 +525,6 @@ static void TransponderTimerTask(void *parameters){
 	vTaskDelay(time_in_min *(60000 / portTICK_RATE_MS)); // ms: s 1000:1 ....
 	unsigned char turn_off_cmd[] = {0x38,1};
 	I2C_write(0x61,turn_off_cmd,2);
-
 }
 
 static Boolean turnOnTransponderWithTask(void){
@@ -550,10 +554,10 @@ static Boolean selectAndExecuteTRXVUDemoTest(void)
 	printf("\t 10) (revD) Get command frame by interrupt \n\r");
 	printf("\t 11) (revD) Get receiver telemetry \n\r");
 	printf("\t 12) (revD) Get transmitter telemetry \n\r");
-	printf("\t 13) TurnOnTransponderWithDelay \n\r");
-	printf("\t 14) TurnOnTransponder \n\r");
-	printf("\t 15) TurnOffTransponder \n\r");
-	printf("\t 16) turnOnTransponderWithTask \n\r");
+	printf("\t 13) Turn On Transponder With Delay \n\r");
+	printf("\t 14) Turn On Transponder \n\r");
+	printf("\t 15) Turn Off Transponder \n\r");
+	printf("\t 16) turn On Transponder With Task \n\r");
 	printf("\t 17) Send Packet Inserted By The User \n\r");
 	printf("\t 18) Beacon test \n\r");
 	printf("\t 19) Clear the Beacon \n\r");
