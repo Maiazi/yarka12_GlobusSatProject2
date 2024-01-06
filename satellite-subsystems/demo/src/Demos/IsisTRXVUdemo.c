@@ -470,9 +470,9 @@ static Boolean vutc_sendPacketInsertedByTheUser(void)
 
 static Boolean beacon_test(void)
 {
-	static unsigned char fromCallSign[7] = {'I', 'K', 'Q', 'H', 'S', '1', 0};
-	static unsigned char toCallSign[7] = {'I', 'K', 'Q', 'G', 'S', '2', 0};
-	static unsigned char data[82] = "KQ Cube Sat Lost in Space, abducted by grumpy old green aliens!";
+	static unsigned char fromCallSign[7] = {'A', 'B', 'C', 'D', 'E', 'F', 0};
+	static unsigned char toCallSign[7] = {'A', 'B', 'C', 'D', 'E', 'F', 0};
+	static unsigned char data[40] = "QubeSat Yarka is in air .. say hi .....";
 	printf("TRXVU Beacon test.\r\n");
 	INPUT_GetSTRING("Beacon Message (max 80 chars): ", data, sizeof(data));
 	unsigned short interval = INPUT_GetUINT16("Becon interval in seconds: ");
