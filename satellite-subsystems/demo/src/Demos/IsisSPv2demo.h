@@ -11,5 +11,5 @@
 #include <hal/boolean.h>
 
 Boolean SolarPanelv2test();
-
+void initSPv2();
 #endif /* ISISSPTEST_H_ */

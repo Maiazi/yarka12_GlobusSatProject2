@@ -116,3 +116,18 @@ Boolean SolarPanelv2test()
 	return TRUE;
 }
 
+void initSPv2(){
+	int retValInt = 0;
+
+	retValInt = IsisSolarPanelv2_initialize(slave0_spi);
+	if(retValInt != 0)
+	{
+		TRACE_WARNING("\n\r IsisSolarPaneltest: IsisSolarPanelv2_initialize returned %d! \n\r", retValInt);
+	}
+
+	retValInt = IsisSolarPanelv2_sleep();
+	if(retValInt != 0)
+	{
+		TRACE_WARNING("\n\r IsisSolarPaneltest: IsisSolarPanelv2_sleep returned %d! \n\r", retValInt);
+	}
+}
