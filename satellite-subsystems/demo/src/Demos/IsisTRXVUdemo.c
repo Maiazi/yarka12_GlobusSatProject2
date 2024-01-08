@@ -439,7 +439,6 @@ static Boolean vutc_sendPacketInsertedByTheUser(void) {
 				"\r\n Transmission of single buffers with default callsign. AX25 Format. \r\n");
 		print_error(
 				IsisTrxvu_tcSendAX25DefClSign(0, testBuffer, 5, &avalFrames));
-
 		if ((avalFrames != 0) && (avalFrames != 255)) {
 			printf("\r\n Number of frames in the buffer: %d  \r\n", avalFrames);
 			txCounter++;
@@ -452,6 +451,9 @@ static Boolean vutc_sendPacketInsertedByTheUser(void) {
 	return TRUE;
 }
 
+/*
+ * this function is to init the SD card, it called in print_beacon_test function
+ */
 Boolean initSD() {
 	int err;
 	err = hcc_mem_init();
@@ -482,7 +484,13 @@ Boolean initSD() {
 	return TRUE;
 }
 
-//print beacon test
+/*
+ * print beacon test
+ * printing: voltage of the battery, Temp of battery and solar panels
+ * printing: (zerem) current out of the battery
+ * printing: the usage of the SD card
+ */
+
 static Boolean print_beacon_test(void) {
 	if (GomEPSdemoInit()) {
 		initSPv2();
@@ -508,13 +516,14 @@ static Boolean print_beacon_test(void) {
 		printf("Current out of the battery = %d mA\r\n",
 				myEpsTelemetry_hk.fields.cursys);
 		SolarPanelv2_Temperature();
+
 		if (initSD()) {
 			F_SPACE space;
 			/* get free space on current drive */
 			int ret = f_getfreespace(f_getdrive(), &space);
 			if (!ret) {
 				printf(
-						"There are %d bytes total, %d bytes free, \%d bytes used, %d bytes bad. \r\n",
+						"\nThere are %d bytes total, %d bytes free, \%d bytes used, %d bytes bad. \r\n",
 						space.total, space.free, space.used, space.bad);
 			} else {
 				printf("\nError %d reading drive\n", ret);
@@ -524,23 +533,25 @@ static Boolean print_beacon_test(void) {
 	return TRUE;
 }
 
-//beacon test
-static Boolean beacon_test(void) {
+/*
+ *beacon test with Ax25 message
+ */
+static Boolean beacon_Ax25_test(void) {
 	static unsigned char fromCallSign[7] = { 'A', 'H', 'V', 'A', '1', '0', 0 };
 	static unsigned char toCallSign[7] = { 'Y', 'A', 'R', 'K', 'A', '1', 0 };
 	static unsigned char data[80] = "";
 	//CubeSat Yarka is in air .. say hi to all universe .....
-	printf("TRXVU Beacon test:\r\n");
+	printf("TRXVU Beacon Ax.25 test:\r\n");
 	printf("write your message:\r\n");
 	INPUT_GetSTRING("Beacon Message (max 80 chars): ", data, sizeof(data));
-	unsigned short interval = INPUT_GetUINT16("Becon interval in seconds: ");
+	unsigned short interval = INPUT_GetUINT16("Beacon interval in seconds: ");
 	int r = IsisTrxvu_tcSetAx25BeaconOvrClSign(0, fromCallSign, toCallSign,
 			data, sizeof(data), interval);
 	print_error(r);
 	return TRUE;
 }
 
-static Boolean clear_beacon_test(void) {
+static Boolean clear_beacon_Ax25_test(void) {
 	int r = IsisTrxvu_tcClearBeacon(0);
 	print_error(r);
 	return TRUE;
@@ -587,7 +598,7 @@ static void TransponderTimerTask(void *parameters) {
 static Boolean turnOnTransponderWithTask(void) {
 	unsigned char turn_on_cmd[] = { 0x38, 2 };
 	I2C_write(0x61, turn_on_cmd, 2);
-	int time_in_min = 0;
+	int time_in_min = 1;
 	while (UTIL_DbguGetIntegerMinMax(&time_in_min, 1, 20) == 0)
 		;
 	xTaskCreate(TransponderTimerTask, (signed char* )"TransponderTimerTask",
@@ -617,8 +628,8 @@ static Boolean selectAndExecuteTRXVUDemoTest(void) {
 	printf("\t 15) Turn Off Transponder \n\r");
 	printf("\t 16) turn On Transponder With Task \n\r");
 	printf("\t 17) Send Packet Inserted By The User \n\r");
-	printf("\t 18) Beacon test \n\r");
-	printf("\t 19) Clear the Beacon \n\r");
+	printf("\t 18) Beacon Ax.25 test \n\r");
+	printf("\t 19) Clear the Ax.25 Beacon test\n\r");
 	printf("\t 20) Print Beacon test \n\r");
 	printf("\t 21) Return to main menu \n\r");
 
@@ -678,10 +689,10 @@ static Boolean selectAndExecuteTRXVUDemoTest(void) {
 		offerMoreTests = vutc_sendPacketInsertedByTheUser();
 		break;
 	case 18:
-		offerMoreTests = beacon_test();
+		offerMoreTests = beacon_Ax25_test();
 		break;
 	case 19:
-		offerMoreTests = clear_beacon_test();
+		offerMoreTests = clear_beacon_Ax25_test();
 		break;
 	case 20:
 		offerMoreTests = print_beacon_test();
