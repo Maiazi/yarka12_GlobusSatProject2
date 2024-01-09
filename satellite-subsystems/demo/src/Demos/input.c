@@ -354,6 +354,7 @@ void INPUT_GetSTRING( char* printStr, char * const str, int len )
 	fflush(stdout);
 
 	_GetInput( str, len );
+
 }
 
 static int _GetInput( char *input, int len )

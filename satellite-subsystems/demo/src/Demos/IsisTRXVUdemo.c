@@ -39,6 +39,7 @@
 #include <hcc/api_fat.h>
 #include <hcc/api_hcc_mem.h>
 #include <hcc/api_mdriver_atmel_mcipdc.h>
+
 ////General Variables
 #define TX_UPBOUND				30
 #define TIMEOUT_UPBOUND			10
@@ -423,7 +424,7 @@ static Boolean vutc_sendPacketInsertedByTheUser(void) {
 	int timeoutCounter = 0;
 	int i;
 	unsigned int temp;
-	printf("\r\nEnter buffer: \r\n");
+	printf("\r\nEnter Hexa buffer: \r\n");
 	for (i = 0; i < 5; i++) {
 		if (UTIL_DbguGetHexa32(&temp) == 1)
 			testBuffer[i] = (unsigned char) temp;
@@ -523,7 +524,7 @@ static Boolean print_beacon_test(void) {
 			int ret = f_getfreespace(f_getdrive(), &space);
 			if (!ret) {
 				printf(
-						"\nThere are %d bytes total, %d bytes free, \%d bytes used, %d bytes bad. \r\n",
+						"\nSD Card space:\n %d bytes total,\n %d bytes free,\n %d bytes used,\n %d bytes bad. \r\n",
 						space.total, space.free, space.used, space.bad);
 			} else {
 				printf("\nError %d reading drive\n", ret);
@@ -547,12 +548,16 @@ static Boolean beacon_Ax25_test(void) {
 	unsigned short interval = INPUT_GetUINT16("Beacon interval in seconds: ");
 	int r = IsisTrxvu_tcSetAx25BeaconOvrClSign(0, fromCallSign, toCallSign,
 			data, sizeof(data), interval);
+	if(r==0)
+		printf("Beacon sent!");
 	print_error(r);
 	return TRUE;
 }
 
 static Boolean clear_beacon_Ax25_test(void) {
 	int r = IsisTrxvu_tcClearBeacon(0);
+	if(r==0)
+		printf("Beacon Ax25 Cleared");
 	print_error(r);
 	return TRUE;
 }
@@ -576,15 +581,20 @@ static Boolean TurnOnTransponderWithDelay(void) {
 
 static Boolean TurnOnTransponder(void) {
 	unsigned char turn_on_cmd[] = { 0x38, 2 };
-	I2C_write(0x61, turn_on_cmd, 2);
-	printf("Transponder is ON \n\r");
+	int* r =I2C_write(0x61, turn_on_cmd, 2);
+	if(r==0)
+		printf("Transponder is ON \n\r");
+	else printf("Error No': {%d} turning transporder ON \n\r",r);
+
 	return TRUE;
 }
 
 static Boolean TurnOffTransponder(void) {
 	unsigned char turn_off_cmd[] = { 0x38, 1 };
-	I2C_write(0x61, turn_off_cmd, 2);
-	printf("Transponder is OFF \n\r");
+	int* r =I2C_write(0x61, turn_off_cmd, 2);
+	if(r==0)
+		printf("Transponder is OFF \n\r");
+	else printf("Error No': {%d} turning transporder OFF \n\r",r);
 	return TRUE;
 }
 

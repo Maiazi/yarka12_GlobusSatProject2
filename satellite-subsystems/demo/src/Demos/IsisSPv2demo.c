@@ -29,7 +29,7 @@ Boolean SolarPanelv2_Temperature()
 
 	IsisSolarPanelv2_wakeup();
 
-	printf("\r\n Temperature values \r\n");
+	printf("\r\nTemperature values \r\n");
 
 	for( panel = 0; panel < ISIS_SOLAR_PANEL_COUNT; panel++ )
 	{
